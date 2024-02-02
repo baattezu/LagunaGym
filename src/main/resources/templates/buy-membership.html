@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <title>Laguna Gym - Buy Membership</title>
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+
+<div th:replace="~{blocks/navbar :: navbar}"></div>
+<!-- Content -->
+<div class="container mt-4">
+    <h2>Buy Membership</h2>
+
+    <!-- Check if user is logged in -->
+    <div class="alert alert-info">
+        <p>Do you have an account?</p>
+        <button class="btn btn-primary" onclick="redirectToLogin()">Yes, let's log in</button>
+        <button class="btn btn-success" onclick="redirectToSignUp()">No, let's sign up</button>
+    </div>
+
+    <!-- Membership Options -->
+    <h4>Choose Your Membership Plan</h4>
+    <div class="row">
+        <!-- Week Membership -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Week Membership</h5>
+                    <p class="card-text">Access to the gym for one week.</p>
+                    <p class="card-text">Price: $30</p>
+                </div>
+            </div>
+        </div>
+        <!-- Month Membership -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Month Membership</h5>
+                    <p class="card-text">Access to the gym for one month.</p>
+                    <p class="card-text">Price: $100</p>
+                </div>
+            </div>
+        </div>
+        <!-- 3 Months Membership -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">3 Months Membership</h5>
+                    <p class="card-text">Access to the gym for three months.</p>
+                    <p class="card-text">Price: $250</p>
+                </div>
+            </div>
+        </div>
+        <!-- 6 Months Membership -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">6 Months Membership</h5>
+                    <p class="card-text">Access to the gym for six months.</p>
+                    <p class="card-text">Price: $450</p>
+                </div>
+            </div>
+        </div>
+        <!-- Year Membership -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Year Membership</h5>
+                    <p class="card-text">Access to the gym for one year.</p>
+                    <p class="card-text">Price: $800</p>
+                </div>
+            </div>
+        </div>
+        <!-- 2 Years Membership -->
+        <div class="col-md-4">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">2 Years Membership</h5>
+                    <p class="card-text">Access to the gym for two years.</p>
+                    <p class="card-text">Price: $1500</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Free Passes Reminder -->
+    <div class="alert alert-info">
+        <p>Register now and get 3 free passes to access the gym!</p>
+    </div>
+</div>
+
+<div th:replace="~{blocks/footer :: footer}"></div>
+
+<!-- Bootstrap JS and dependencies -->
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<!-- Custom Script for Redirecting -->
+<script>
+    function redirectToLogin() {
+        // Redirect to login page
+        window.location.href = "login.html";
+    }
+
+    function redirectToSignUp() {
+        // Redirect to sign up page
+        window.location.href = "signup.html";
+    }
+</script>
+
+</body>
+</html>

@@ -1,9 +1,12 @@
 package com.lagunagym.LagunaGym.services;
 
 import com.lagunagym.LagunaGym.models.Product;
+import com.lagunagym.LagunaGym.models.specifications.ProductSpecs;
 import com.lagunagym.LagunaGym.repositories.ProductRepository;
 import jakarta.persistence.Id;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import javax.swing.text.html.Option;
@@ -54,5 +57,20 @@ public class ProductService {
                 .filter(product -> (maxPrice == null || product.getPrice() <= maxPrice))
                 .collect(Collectors.toList());
         return filteredProducts;
+    }
+    public List<Product> getProductListWithFilters(String substr, Double minPrice, Double maxPrice, Pageable pageable){
+        Specification<Product> filters = Specification.where(null);
+        if (substr != null) {
+            filters = filters.and(ProductSpecs.containsWord(substr));
+        }
+
+        if (minPrice != null) {
+            filters = filters.and(ProductSpecs.priceGreaterThan(minPrice));
+        }
+
+        if (maxPrice != null) {
+            filters = filters.and(ProductSpecs.priceLessThan(maxPrice));
+        }
+        return productRepository.findAll(filters, pageable).getContent();
     }
 }

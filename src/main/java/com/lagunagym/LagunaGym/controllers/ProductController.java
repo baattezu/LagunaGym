@@ -4,6 +4,7 @@ import com.lagunagym.LagunaGym.models.Person;
 import com.lagunagym.LagunaGym.models.Product;
 import com.lagunagym.LagunaGym.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -19,11 +20,18 @@ public class ProductController {
 
     @GetMapping
     public String productPage(Model model,
+                              @RequestParam(value = "page",required = false) String page,
                               @RequestParam(value = "filterByTitle",required = false) String title,
                               @RequestParam(value = "minPrice",required = false) Double minPrice,
                               @RequestParam(value = "maxPrice",required = false) Double maxPrice){
-        model.addAttribute("products", productService.getFilteredProductList(title,minPrice,maxPrice));
-        model.addAttribute("product", productService.createProductForForm());
+        Integer currentPage = 0;
+        if (page != null){
+             currentPage = Integer.parseInt(page);
+        }
+        model.addAttribute("products",
+                productService.getProductListWithFilters(title, minPrice, maxPrice, PageRequest.of(currentPage,3)));
+        model.addAttribute("product",
+                productService.createProductForForm());
         return "products";
     }
     @PostMapping("/add")

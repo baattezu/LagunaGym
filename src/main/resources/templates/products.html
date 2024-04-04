@@ -12,7 +12,7 @@
 <div th:replace="~{blocks/navbar :: navbar}"></div>
 
 
-  <div class="container-fluid" >
+  <div class="container-fluid">
       <div class="btn-group">
           <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" style="margin: 30px">
               Add product
@@ -46,9 +46,9 @@
           </button>
           <div class="dropdown-menu" aria-labelledby="filter">
               <form th:action="@{/products}" method="get">
-                  <input type="text" name="filterByTitle" value="" placeholder="filter by word">
-                  <input type="number" name="minPrice" value="" placeholder="min price">
-                  <input type="number" name="maxPrice" value="" placeholder="max price">
+                  <input type="text" name="filterByTitle" th:value="${param.filterByTitle != null ? param.filterByTitle : ''}" placeholder="filter by word">
+                  <input type="number" name="minPrice" th:value="${param.minPrice != null ? param.minPrice : ''}" placeholder="min price">
+                  <input type="number" name="maxPrice" th:value="${param.maxPrice != null ? param.maxPrice : ''}" placeholder="max price">
                   <button type="submit" class="btn btn-primary"> Filter </button>
               </form>
           </div>
@@ -81,6 +81,16 @@
           </div>
     </div>
   </div>
+    <nav aria-label="Page navigation">
+        <ul class="pagination">
+
+            <li class="page-item"><a class="page-link" th:href="@{/products?page=0}">1</a></li>
+            <li class="page-item"><a class="page-link" th:href="@{/products?page=1}">2</a></li>
+            <li class="page-item"><a class="page-link" th:href="@{/products?page=2}">3</a></li>
+            <!-- Add more page links here as needed -->
+           
+        </ul>
+    </nav>
 
 <div th:replace="~{blocks/footer :: footer}"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>

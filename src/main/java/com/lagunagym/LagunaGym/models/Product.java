@@ -1,6 +1,5 @@
 package com.lagunagym.LagunaGym.models;
 
-import com.lagunagym.LagunaGym.repositories.PersonRepository;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -15,14 +14,12 @@ public class Product {
 
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
     private String description;
     private double price;
+    private Integer views;
 
-    public Product (Long id){
-        this.id = id;
-    }
 }

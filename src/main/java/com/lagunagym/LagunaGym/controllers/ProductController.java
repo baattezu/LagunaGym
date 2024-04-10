@@ -1,6 +1,5 @@
 package com.lagunagym.LagunaGym.controllers;
 
-import com.lagunagym.LagunaGym.models.Person;
 import com.lagunagym.LagunaGym.models.Product;
 import com.lagunagym.LagunaGym.services.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,8 +17,17 @@ public class ProductController {
         this.productService = productService;
     }
 
+
+    @GetMapping("/{id}")
+    public String singleProductPage(Model model, @PathVariable(name = "id") String id){
+        Product product = productService.getViewOfProduct(id);
+        model.addAttribute("product", product);
+        return "product";
+    }
+
+
     @GetMapping
-    public String productPage(Model model,
+    public String productsPage(Model model,
                               @RequestParam(value = "page",required = false) String page,
                               @RequestParam(value = "filterByTitle",required = false) String title,
                               @RequestParam(value = "minPrice",required = false) Double minPrice,
@@ -29,14 +37,15 @@ public class ProductController {
              currentPage = Integer.parseInt(page);
         }
         model.addAttribute("products",
-                productService.getProductListWithFilters(title, minPrice, maxPrice, PageRequest.of(currentPage,3)));
+                productService.getProductListWithFilters(title, minPrice, maxPrice, PageRequest.of(currentPage,4)));
         model.addAttribute("product",
-                productService.createProductForForm());
+                new Product());
+        model.addAttribute("top3", productService.getTop3());
         return "products";
     }
+
     @PostMapping("/add")
     public String addProduct(@ModelAttribute(value = "product") Product product){
-        System.out.println(product.getId());
         productService.addProduct(product);
         return "redirect:/products";
     }

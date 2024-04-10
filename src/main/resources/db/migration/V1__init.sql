@@ -1,23 +1,37 @@
-create sequence person_seq start with 1 increment by 50;
-create sequence subscription_seq start with 1 increment by 50;
-create table person (
-    id bigint not null,
-    email varchar(255),
+
+create table users (
+    id serial,
+    username varchar(255),
     f_name varchar(255),
     l_name varchar(255),
     password varchar(255),
     primary key (id)
                     );
+create table roles (
+    id serial primary key ,
+    role_title varchar(77)
+);
+create table users_roles(
+    user_id int not null ,
+    role_id int not null,
+    constraint fk_user_id_01 foreign key (user_id) references users (id),
+    constraint fk_role_id_02 foreign key (role_id) references roles (id)
+);
+insert into users (username,password)
+values ('fall','$2a$12$6ASimk2Wy9BGsZ5JeuEcZegdYzFmbsNgoAuGUIHaYSfcwlyOa5Es.')
+     , ('down','$2a$12$6ASimk2Wy9BGsZ5JeuEcZegdYzFmbsNgoAuGUIHaYSfcwlyOa5Es.');
+
+insert into roles (role_title) values ('ADMIN'), ('USER');
+insert into users_roles (user_id, role_id)
+values (1,1),(1,2),(2,2);
+
 create table subscription (
-    price float(53) not null,
-    id bigint not null,
+    id serial,
     title varchar(255),
+    price float(53) not null,
     primary key (id));
+
 -- Inserting values into the person table
-INSERT INTO person (id, email, f_name, l_name, password) VALUES
-(1, 'john@example.com', 'John', 'Doe', 'password123'),
-(2, 'jane@example.com', 'Jane', 'Smith', 'qwerty789'),
-(3, 'bob@example.com', 'Bob', 'Johnson', 'pass123');
 
 -- Inserting values into the subscription table
 INSERT INTO subscription (price, id, title) VALUES

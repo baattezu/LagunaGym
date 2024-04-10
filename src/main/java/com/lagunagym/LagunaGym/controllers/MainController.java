@@ -10,9 +10,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class MainController {
 
     @GetMapping
-    public String home(Model model, Authentication authentication) {
+    public String home(Model model) {
         model.addAttribute("title", "Main page");
-        model.addAttribute("name",authentication.getName());
         return "home";
     }
 

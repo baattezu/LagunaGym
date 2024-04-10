@@ -4,6 +4,7 @@ import com.lagunagym.LagunaGym.models.Product;
 import com.lagunagym.LagunaGym.models.specifications.ProductSpecs;
 import com.lagunagym.LagunaGym.repositories.ProductRepository;
 import jakarta.persistence.Id;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
@@ -21,14 +22,10 @@ public class ProductService {
     public void setProductRepository(ProductRepository productRepository) {
         this.productRepository = productRepository;
     }
-    public Product createProductForForm(){
-        Long lastId = 0L;
-        for( Product ps : productRepository.findAll()){
-            lastId = ps.getId();
-        }
-        return new Product(lastId+1);
-    }
+
     public void addProduct(Product product){
+        product.setId(productRepository.findMaxUid()+1);
+        product.setViews(0);
         productRepository.save(product);
     }
     public void removeProduct(Long id){
@@ -42,21 +39,12 @@ public class ProductService {
         product.setPrice(price);
         productRepository.save(product);
     }
-    public List<Product> getProductList(){
-        return (List<Product>) productRepository.findAll();
-    }
-    public List<Product> getFilteredProductList(String title, Double minPrice, Double maxPrice){
-        List<Product> allProducts = (List<Product>) productRepository.findAll();
-        List<Product> filteredProducts = allProducts.stream()
-                .filter(product -> {
-                    String prodTitleLow = product.getTitle().toLowerCase();
-                    String filtTitleLow = title != null ? title.toLowerCase() : "ladno";
-                    return (title == null || prodTitleLow.contains(filtTitleLow));
-                })
-                .filter(product -> (minPrice == null || product.getPrice() >= minPrice))
-                .filter(product -> (maxPrice == null || product.getPrice() <= maxPrice))
-                .collect(Collectors.toList());
-        return filteredProducts;
+    @Transactional
+    public Product getViewOfProduct(String id){
+        Product product = productRepository.findById(Long.parseLong(id)).orElseThrow();
+        product.setViews(product.getViews()+1);
+        productRepository.save(product);
+        return product;
     }
     public List<Product> getProductListWithFilters(String substr, Double minPrice, Double maxPrice, Pageable pageable){
         Specification<Product> filters = Specification.where(null);
@@ -72,5 +60,12 @@ public class ProductService {
             filters = filters.and(ProductSpecs.priceLessThan(maxPrice));
         }
         return productRepository.findAll(filters, pageable).getContent();
+    }
+    public void updateViews(Product product){
+        product.setViews(product.getViews()+1);
+    }
+
+    public List<Product> getTop3() {
+        return productRepository.findTop3ByOrderByViewsDesc();
     }
 }

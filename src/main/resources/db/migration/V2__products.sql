@@ -1,6 +1,6 @@
-create sequence product_seq start with 1 increment by 50;
+
 create table product(
-     id bigint not null,
+     id serial,
      title varchar(255),
      description varchar(255),
      price double precision,

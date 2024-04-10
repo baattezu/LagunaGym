@@ -1,0 +1,1 @@
+ALTER TABLE product ADD views int DEFAULT(0);

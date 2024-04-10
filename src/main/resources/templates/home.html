@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
+<html xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -17,7 +17,7 @@
 
 <div class="container mt-4">
   <!-- Welcome Banner -->
-  <span th:text="${'hello, '+  name}"></span>
+  <span th:text="${'hello, '+  name}" sec:authorize="isAuthenticated()"></span>
   <div class="jumbotron">
     <h1 class="display-4">Welcome to Laguna Gym!</h1>
     <p class="lead">Your destination for a healthy and fit lifestyle.</p>

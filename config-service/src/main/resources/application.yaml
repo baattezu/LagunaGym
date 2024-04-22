@@ -7,7 +7,7 @@ spring:
     config:
       server:
         git:
-          uri: https://config.url
+          uri: https://github.com/baattezu/demo-config-server
           clone-on-start: true
 
 

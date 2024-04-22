@@ -1,19 +1,17 @@
-package com.lagunagym.LagunaGym.services;
+package org.example.productservice.services;
 
-import com.lagunagym.LagunaGym.models.Product;
-import com.lagunagym.LagunaGym.models.specifications.ProductSpecs;
-import com.lagunagym.LagunaGym.repositories.ProductRepository;
-import jakarta.persistence.Id;
+
+
 import jakarta.transaction.Transactional;
+import org.example.productservice.entities.Product;
+import org.example.productservice.entities.specifications.ProductSpecs;
+import org.example.productservice.repos.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
-import javax.swing.text.html.Option;
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class ProductService {
@@ -40,26 +38,28 @@ public class ProductService {
         productRepository.save(product);
     }
     @Transactional
-    public Product getViewOfProduct(String id){
+    public Product getProduct(String id){
         Product product = productRepository.findById(Long.parseLong(id)).orElseThrow();
         product.setViews(product.getViews()+1);
         productRepository.save(product);
         return product;
     }
-    public List<Product> getProductListWithFilters(String substr, Double minPrice, Double maxPrice, Pageable pageable){
-        Specification<Product> filters = Specification.where(null);
-        if (substr != null) {
-            filters = filters.and(ProductSpecs.containsWord(substr));
-        }
+//    public List<Product> getProductListWithFiltersAndPagination(String substr, Double minPrice, Double maxPrice, Pageable pageable){
+//        Specification<Product> filters = Specification.where(null);
+//        if (substr != null) {
+//            filters = filters.and(ProductSpecs.containsWord(substr));
+//        }
+//        if (minPrice != null) {
+//            filters = filters.and(ProductSpecs.priceGreaterThan(minPrice));
+//        }
+//        if (maxPrice != null) {
+//            filters = filters.and(ProductSpecs.priceLessThan(maxPrice));
+//        }
+//        return productRepository.findAll(filters, pageable).getContent();
+//    }
 
-        if (minPrice != null) {
-            filters = filters.and(ProductSpecs.priceGreaterThan(minPrice));
-        }
-
-        if (maxPrice != null) {
-            filters = filters.and(ProductSpecs.priceLessThan(maxPrice));
-        }
-        return productRepository.findAll(filters, pageable).getContent();
+    public List<Product> getProductListWithPagination(Pageable pageable){
+        return productRepository.findAll(pageable).getContent();
     }
     public void updateViews(Product product){
         product.setViews(product.getViews()+1);

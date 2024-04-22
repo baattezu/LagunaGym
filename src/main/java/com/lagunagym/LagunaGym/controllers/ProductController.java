@@ -1,63 +1,57 @@
 package com.lagunagym.LagunaGym.controllers;
 
-import com.lagunagym.LagunaGym.models.Product;
-import com.lagunagym.LagunaGym.services.ProductService;
+
+
+import com.lagunagym.LagunaGym.models.ProductDTO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Controller
 @RequestMapping("/products")
 public class ProductController {
-    private ProductService productService;
     @Autowired
-    public void setProductService(ProductService productService) {
-        this.productService = productService;
-    }
+    private RestTemplate restTemplate; // If using RestTemplate
 
-
+    private final String PRODUCTS_REST_API_URL = "http://localhost:8765/product-service/api/products";
     @GetMapping("/{id}")
     public String singleProductPage(Model model, @PathVariable(name = "id") String id){
-        Product product = productService.getViewOfProduct(id);
-        model.addAttribute("product", product);
+        ProductDTO productDTO = restTemplate.getForEntity(PRODUCTS_REST_API_URL + "/ "+id, ProductDTO.class).getBody();
+        model.addAttribute("product", productDTO);
         return "product";
     }
 
 
     @GetMapping
-    public String productsPage(Model model,
-                              @RequestParam(value = "page",required = false) String page,
-                              @RequestParam(value = "filterByTitle",required = false) String title,
-                              @RequestParam(value = "minPrice",required = false) Double minPrice,
-                              @RequestParam(value = "maxPrice",required = false) Double maxPrice){
-        Integer currentPage = 0;
-        if (page != null){
-             currentPage = Integer.parseInt(page);
-        }
+    public String productsPage(Model model){
+        ProductDTO[] products = restTemplate.getForEntity(PRODUCTS_REST_API_URL, ProductDTO[].class).getBody();
         model.addAttribute("products",
-                productService.getProductListWithFilters(title, minPrice, maxPrice, PageRequest.of(currentPage,4)));
+                Arrays.asList(products));
         model.addAttribute("product",
-                new Product());
-        model.addAttribute("top3", productService.getTop3());
+                new ProductDTO());
         return "products";
     }
-
-    @PostMapping("/add")
-    public String addProduct(@ModelAttribute(value = "product") Product product){
-        productService.addProduct(product);
-        return "redirect:/products";
-    }
-    @PostMapping("/edit")
-    public String editProduct(@RequestParam("ed_id") Long id, @RequestParam("ed_title") String title
-            , @RequestParam("ed_desc") String desc, @RequestParam("ed_price") Double price){
-        productService.updateProduct(id,title,desc,price);
-        return "redirect:/products";
-    }
-    @PostMapping("/delete")
-    public String deleteProduct(@RequestParam(value="del_id") Long id){
-        productService.removeProduct(id);
-        return "redirect:/products";
-    }
+//
+//    @PostMapping("/add")
+//    public String addProduct(@ModelAttribute(value = "product") Product product){
+//        productService.addProduct(product);
+//        return "redirect:/products";
+//    }
+//    @PostMapping("/edit")
+//    public String editProduct(@RequestParam("ed_id") Long id, @RequestParam("ed_title") String title
+//            , @RequestParam("ed_desc") String desc, @RequestParam("ed_price") Double price){
+//        productService.updateProduct(id,title,desc,price);
+//        return "redirect:/products";
+//    }
+//    @PostMapping("/delete")
+//    public String deleteProduct(@RequestParam(value="del_id") Long id){
+//        productService.removeProduct(id);
+//        return "redirect:/products";
+//    }
 }

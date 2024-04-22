@@ -81,16 +81,16 @@
               </div>
           </div>
     </div>
-      <div class="row">
-          <div class="card" style="margin: 30px; width: 18rem;" th:each="prod_of_top3: ${top3}">
-              <div class="card-body">
-                  <h5 class="card-title" th:text="${prod_of_top3.title}" ></h5>
-                  <p class="card-text" th:text="${prod_of_top3.description}"></p>
-                  <p th:text="${prod_of_top3.price} + ' KZT'"></p>
-                  <a th:href="@{/products/{id}(id=${prod_of_top3.id})}" class="btn btn-secondary"> Go to </a>
-              </div>
-          </div>
-      </div>
+<!--      <div class="row">-->
+<!--          <div class="card" style="margin: 30px; width: 18rem;" th:each="prod_of_top3: ${top3}">-->
+<!--              <div class="card-body">-->
+<!--                  <h5 class="card-title" th:text="${prod_of_top3.title}" ></h5>-->
+<!--                  <p class="card-text" th:text="${prod_of_top3.description}"></p>-->
+<!--                  <p th:text="${prod_of_top3.price} + ' KZT'"></p>-->
+<!--                  <a th:href="@{/products/{id}(id=${prod_of_top3.id})}" class="btn btn-secondary"> Go to </a>-->
+<!--              </div>-->
+<!--          </div>-->
+<!--      </div>-->
   </div>
     <nav aria-label="Page navigation">
         <ul class="pagination">
@@ -99,7 +99,7 @@
             <li class="page-item"><a class="page-link" th:href="@{/products?page=1}">2</a></li>
             <li class="page-item"><a class="page-link" th:href="@{/products?page=2}">3</a></li>
             <!-- Add more page links here as needed -->
-           
+
         </ul>
     </nav>
 

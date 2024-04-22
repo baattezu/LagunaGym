@@ -1,9 +1,7 @@
-package com.lagunagym.LagunaGym.repositories;
+package org.example.productservice.repos;
 
-import com.lagunagym.LagunaGym.models.Product;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+
+import org.example.productservice.entities.Product;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
@@ -12,7 +10,7 @@ import org.springframework.data.repository.PagingAndSortingRepository;
 
 import java.util.List;
 
-public interface ProductRepository extends PagingAndSortingRepository<Product, Long>, JpaSpecificationExecutor<Product>, CrudRepository<Product,Long>, JpaRepository<Product,Long> {
+public interface ProductRepository extends PagingAndSortingRepository<Product, Long>, JpaSpecificationExecutor<Product>, JpaRepository<Product,Long> {
     @Query(value = "SELECT MAX(p.id) FROM Product p")
     Long findMaxUid(); // blya ya tupoi
 

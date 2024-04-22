@@ -1,6 +1,7 @@
-package com.lagunagym.LagunaGym.models.specifications;
+package org.example.productservice.entities.specifications;
 
-import com.lagunagym.LagunaGym.models.Product;
+
+import org.example.productservice.entities.Product;
 import org.springframework.data.jpa.domain.Specification;
 
 public class ProductSpecs {

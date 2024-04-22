@@ -1,4 +1,5 @@
-package com.lagunagym.LagunaGym.models;
+package org.example.productservice.entities;
+
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;

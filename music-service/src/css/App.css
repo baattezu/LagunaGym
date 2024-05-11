@@ -1,0 +1,48 @@
+
+
+.App-link {
+  color: #61dafb;
+}
+
+
+img{
+  height: 200px;
+}
+
+main{
+  margin: 20px;
+}
+aside{
+  width: 20%;
+  margin-top: 50px;
+  margin-left: 5%;
+  float: right;
+}
+main .user{
+  margin-bottom: 50px;
+  background-color: orange;
+  padding: 20px;
+}
+main .edit-icon:hover,main .delete-icon:hover{
+  opacity: 50%;
+}
+main .edit-icon,main .delete-icon{
+  float:right
+}
+form button{
+  width: 50%;
+  background: dodgerblue;
+  color: #fff;
+  border: #fff;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+form input{
+   width: 50%;
+   border: black;
+   font-weight: bold;
+   margin-bottom: 10px;
+ }
+form button:hover{
+  background-color: darkviolet;
+}

@@ -1,0 +1,11 @@
+
+body {
+  background: rgb(215,189,211);
+  background: linear-gradient(90deg, rgba(215,189,211,1) 0%, rgba(174,201,225,1) 50%, rgba(156,183,231,1) 100%);
+}
+
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}

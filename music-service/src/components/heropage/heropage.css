@@ -1,0 +1,48 @@
+.heropage{
+    display: flex;
+}
+.heropage-text{
+    margin-left: 120px;
+    font-size: 40px;
+    width: 500px;
+    color: #02153D;
+    font-weight: bold;
+}
+
+
+.heropage-button1{
+    color: #02153D;
+    background-color: #ffffff;
+    border: #aec9e1;
+}
+.heropage-button2{
+    margin-left: 30px;
+    color: white;
+    background-color: #02153D;
+}
+.button-group{
+    margin-top: 20px;
+    margin-left: 140px;
+}
+button{
+    font-size: 16px;
+    font-weight: bold;
+    width: 142px;
+    height: 40px;
+    border-radius: 12px;
+    opacity: 80%;
+}
+button:hover{
+    opacity: 100%;
+}
+
+
+
+
+.image {
+    margin-top: 60px;
+    width: 839px;
+    height: 544px;
+    border-radius: 10% 30% 10% 30%;
+}
+

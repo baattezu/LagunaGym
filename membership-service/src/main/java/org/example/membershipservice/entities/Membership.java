@@ -1,18 +1,29 @@
 package org.example.membershipservice.entities;
 
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Data;
 
 @Entity
 @Data
+@Table(name = "memberships")
 public class Membership {
+
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private String title;
-    private Integer days;
-    private Double price;
+
+    @Column(name = "name")
+    private String name;
+
+    @Column(name = "description")
+    private String description;
+
+    @Column(name = "duration_days")
+    private int durationDays;
+
+    @Column(name = "price")
+    private double price;
+
+    // Getters and setters
 }
+

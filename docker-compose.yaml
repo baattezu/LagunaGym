@@ -1,0 +1,27 @@
+version: '3.8'
+services:
+  postgres:
+    image: postgres
+    container_name: postgres-lagunagym
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: temirkhan322
+      POSTGRES_DB: lagunagym
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+  flyway:
+    image: flyway/flyway:latest
+    container_name: flyway-lagunagym
+    environment:
+      - FLYWAY_USER=postgres
+      - FLYWAY_PASSWORD=temirkhan322
+      - FLYWAY_URL=jdbc:postgres://postgres:5432/lagunagym?currentSchema=boot
+    command: -locations=filesystem://flyway/sql migrate
+    volumes:
+      - ./src/main/resources/db/migration:/flyway/sql
+    depends_on:
+      - postgres
+#  ХЗ пока не уверен, хотел же в кубернетес выпустить MSA

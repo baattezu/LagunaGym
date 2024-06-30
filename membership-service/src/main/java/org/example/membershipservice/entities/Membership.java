@@ -18,8 +18,8 @@ public class Membership {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "duration_days")
-    private int durationDays;
+    @Column(name = "months")
+    private int months;
 
     @Column(name = "price")
     private double price;

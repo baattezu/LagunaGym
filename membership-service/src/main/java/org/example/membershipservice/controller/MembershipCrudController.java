@@ -1,8 +1,8 @@
-package org.example.membershipservice.controllers;
+package org.example.membershipservice.controller;
 
 
 import org.example.membershipservice.entities.Membership;
-import org.example.membershipservice.services.MembershipService;
+import org.example.membershipservice.service.MembershipService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,11 +10,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/memberships")
-public class MembershipController {
+public class MembershipCrudController {
 
     private final MembershipService membershipService;
 
-    public MembershipController(MembershipService membershipService) {
+    public MembershipCrudController(MembershipService membershipService) {
         this.membershipService = membershipService;
     }
 
@@ -42,25 +42,13 @@ public class MembershipController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Membership> updateMembership(@PathVariable Long id, @RequestBody Membership membership) {
-        Membership existingMembership = membershipService.getMembershipById(id);
-        if (existingMembership != null) {
-            membership.setId(id);
-            Membership updatedMembership = membershipService.saveMembership(membership);
-            return ResponseEntity.ok(updatedMembership);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+        return ResponseEntity.ok(membershipService.updateMembership(id, membership));
     }
 
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteMembership(@PathVariable Long id) {
-        Membership existingMembership = membershipService.getMembershipById(id);
-        if (existingMembership != null) {
-            membershipService.deleteMembership(id);
-            return ResponseEntity.noContent().build();
-        } else {
-            return ResponseEntity.notFound().build();
-        }
+    public ResponseEntity<String> deleteMembership(@PathVariable Long id) {
+        membershipService.deleteMembership(id);
+        return ResponseEntity.ok(String.format("Membership is deleted with id: %d", id));
     }
 }

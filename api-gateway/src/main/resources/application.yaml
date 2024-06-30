@@ -9,17 +9,27 @@ spring:
           lower-case-service-id: true
       routes:
         - id: membership-service
-          uri: ${MEMBERSHIP-SERVICE_URI:http://localhost:8084}
+          uri: lb://membership-service
           predicates:
             - Path=/memberships/**
           filters:
             - PrefixPath=/api
             - AddResponseHeader=X-Powered-By, Temoxa Gateway Service
         - id: auth-service
-          uri: ${AUTH_SERVICE_URI:http://localhost:8082}
+          uri: lb://auth-service
           predicates:
             - Path=/api/auth/**
+        - id: user-service
+          uri: lb://user-service
+          predicates:
+            - Path=/users/**
+          filters:
+            - PrefixPath=/api
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
 server:
   port: 8765
 

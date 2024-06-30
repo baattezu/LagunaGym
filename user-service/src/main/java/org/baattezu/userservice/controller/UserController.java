@@ -1,11 +1,11 @@
 package org.baattezu.userservice.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.apache.catalina.User;
+import org.baattezu.userservice.dto.MembershipRequest;
 import org.baattezu.userservice.model.UserInfo;
-import org.baattezu.userservice.service.UserInfoExistsException;
+import org.baattezu.userservice.dto.UserInfoRequest;
 import org.baattezu.userservice.service.UserService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,18 +21,16 @@ public class UserController {
     public ResponseEntity<List<UserInfo>> getUsers(){
         return ResponseEntity.ok(userService.getUsers());
     }
-    @PostMapping
-    public ResponseEntity<UserInfo> saveUser(@RequestBody UserInfo userInfo) throws UserInfoExistsException {
-        return ResponseEntity.ok(userService.createUserInfo(userInfo));
-    }
+
     @GetMapping("/{id}")
     public ResponseEntity<UserInfo> getUserProfileById(@PathVariable Long id) {
         return ResponseEntity.ok(userService.getUserInfoById(id));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<UserInfo> updateUserProfile(@PathVariable Long id , @RequestBody UserInfo userInfo){
-        userInfo.setId(id);
+    @PutMapping
+    public ResponseEntity<UserInfo> updateUserProfileByEmail(
+            @Valid @RequestBody UserInfoRequest userInfo
+    ){
         return ResponseEntity.ok(userService.updateUserInfo(userInfo));
     }
 
@@ -40,6 +38,11 @@ public class UserController {
     public ResponseEntity<Void> deleteUserProfileById(@PathVariable Long id) {
         userService.deleteUserInfo(id);
         return ResponseEntity.noContent().build();
+    }
+    @PostMapping("/{userId}/memberships")
+    public ResponseEntity<UserInfo> addMembershipToUser(@PathVariable Long userId, @RequestBody MembershipRequest membershipRequest) {
+        UserInfo updatedUser = userService.addMembershipToUser(userId, membershipRequest);
+        return ResponseEntity.ok(updatedUser);
     }
 
 

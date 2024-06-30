@@ -2,15 +2,11 @@ package org.baattezu.authservice.controllers;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.baattezu.authservice.model.AuthenticationRequest;
-import org.baattezu.authservice.model.AuthenticationResponse;
-import org.baattezu.authservice.model.RegisterRequest;
-import org.baattezu.authservice.model.User;
+import org.baattezu.authservice.configs.UserFeignClient;
+import org.baattezu.authservice.model.*;
 import org.baattezu.authservice.services.AuthenticationService;
-import org.springframework.aot.hint.annotation.RegisterReflectionForBinding;
-import org.springframework.http.RequestEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,12 +20,25 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthenticationService authenticationService;
+    private final UserFeignClient userFeignClient;
 
     @PostMapping("/register")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid @RequestBody RegisterRequest request
     ){
-        return ResponseEntity.ok(authenticationService.register(request));
+        try {
+            AuthenticationResponse registerResponse = authenticationService.register(request);
+            try {
+                userFeignClient.saveUser(new UserInfoDto(request.getEmail()));
+            } catch (Exception ex) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                        .body(new AuthenticationResponse("User registration failed. Please try again later."));
+            }
+            return ResponseEntity.ok(registerResponse);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new AuthenticationResponse("Registration failed. Please try again later."));
+        }
     }
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> authenticate(

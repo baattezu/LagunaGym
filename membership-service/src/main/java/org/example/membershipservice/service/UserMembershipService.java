@@ -3,6 +3,7 @@ package org.example.membershipservice.service;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.membershipservice.client.UserServiceClient;
 import org.example.membershipservice.dto.UserMembershipResponse;
 import org.example.membershipservice.entities.Membership;
 import org.example.membershipservice.entities.UserMembership;
@@ -11,14 +12,14 @@ import org.example.membershipservice.exception.FreezeException;
 import org.example.membershipservice.exception.NotFoundException;
 import org.example.membershipservice.repository.MembershipRepository;
 import org.example.membershipservice.repository.UserMembershipRepository;
-import org.springframework.cglib.core.Local;
+
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.time.chrono.ChronoLocalDate;
+
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
@@ -30,6 +31,7 @@ public class UserMembershipService {
 
     private final UserMembershipRepository userMembershipRepository;
     private final MembershipRepository membershipRepository;
+    private final UserServiceClient userServiceClient;
 
     private Membership findMembershipById(Long membershipId){
         return membershipRepository.findById(membershipId)
@@ -98,6 +100,13 @@ public class UserMembershipService {
         }
     }
 
+    /* todo получение информации о абонементе
+        1) заполняем отдельный класс вместе с нешаблонными данными
+        в которых указано количество дней до конца абонемента и сформатированная дата конца
+        2) в зависимости от того заморожен ли абонемент мы добавляем заморозку или нет
+        null нету
+        дата(12.12.2012) есть
+     */
 
     public UserMembershipResponse getUserMembershipInfoResponse(Long userId){
         UserMembership userMembership = findUserMembershipById(userId);
@@ -117,6 +126,12 @@ public class UserMembershipService {
         }
         return response;
     }
+    /* todo добавление абонемента к пользователю
+        1) проверка на существующий абонемент
+        2) в зависимости от существования либо добавляем дни в абонемент или создаем новый
+        3) при создании нового просто заполняем все даты
+     */
+
 
     public UserMembership addMembershipToUser(Long userId, Long membershipId){
         Membership membership = findMembershipById(membershipId);
@@ -154,6 +169,12 @@ public class UserMembershipService {
     }
 
 
+    /* todo make freezeMembership / сделать заморозку абонемента
+        1) беру id и желаемую дату заморозки ,и объявляю данные для работы
+        2) проверяю заморожен ли уже абонемент
+        3) проверяю правильная ли дата в контексте заморозки (не раньше начала, не позже конца абонемента)
+        4) считаю дни с начала (сейчас) и до конца заморозки и добавляю их в общее количество дней после заморозки
+     */
     public UserMembership freezeMembership(
             Long userId,
             LocalDate freezeUntil
@@ -178,6 +199,10 @@ public class UserMembershipService {
 
         return userMembershipRepository.save(userMembership);
     }
+
+    // todo вспомогательный метод для разморозки в
+    //  котором мы считаем дни с разморозки до заморозки
+    //  и отнимаем их с общего количества дней
     private void unfreezeMembership(
             UserMembership userMembership,
             LocalDate now,
@@ -190,7 +215,7 @@ public class UserMembershipService {
         userMembership.setFrozenUntil(now);
         userMembership.setLastFreeze(now);
     }
-
+    // todo метод для контроллера
     public UserMembership unfreezeMembership(Long userId) {
         UserMembership userMembership = findUserMembershipById(userId);
         LocalDate now = LocalDate.now();

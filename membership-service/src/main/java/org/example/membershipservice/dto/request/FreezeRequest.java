@@ -1,4 +1,4 @@
-package org.example.membershipservice.dto;
+package org.example.membershipservice.dto.request;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;

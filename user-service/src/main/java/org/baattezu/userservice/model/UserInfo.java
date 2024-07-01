@@ -1,7 +1,10 @@
 package org.baattezu.userservice.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
+
+import java.time.LocalDate;
 
 @Entity
 @Data
@@ -26,8 +29,16 @@ public class UserInfo {
     private String phoneNumber;
 
     @Column(name = "birth_date")
-    private java.util.Date birthDate;
+    @JsonFormat(pattern = "dd.MM.yyyy")
+    private LocalDate birthDate;
 
     @Column(name = "membership_id")
     private Long membershipId;
+
+
+    public UserInfo(String email){
+        this.email = email;
+    }
+    public UserInfo (){
+    }
 }

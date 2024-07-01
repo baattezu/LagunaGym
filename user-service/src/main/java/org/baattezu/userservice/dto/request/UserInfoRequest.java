@@ -1,19 +1,16 @@
-package org.baattezu.userservice.dto;
+package org.baattezu.userservice.dto.request;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Data
 public class UserInfoRequest {
-
-    @Email(message = "Email should be valid")
-    @NotBlank(message = "Email is mandatory")
-    private String email;
 
     @NotBlank(message = "First name is mandatory")
     private String firstName;
@@ -27,6 +24,7 @@ public class UserInfoRequest {
     private String phoneNumber;
 
     @NotNull(message = "Birth date is mandatory")
-    private Date birthDate;
+    @JsonFormat(pattern = "dd.MM.yyyy")
+    private LocalDate birthDate;
 
 }

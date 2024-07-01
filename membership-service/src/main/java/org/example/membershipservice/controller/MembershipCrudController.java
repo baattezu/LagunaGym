@@ -1,15 +1,18 @@
 package org.example.membershipservice.controller;
 
 
+import jakarta.validation.Valid;
 import org.example.membershipservice.entities.Membership;
 import org.example.membershipservice.service.MembershipService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/memberships")
+@Validated
 public class MembershipCrudController {
 
     private final MembershipService membershipService;
@@ -35,13 +38,13 @@ public class MembershipCrudController {
     }
 
     @PostMapping
-    public ResponseEntity<Membership> createMembership(@RequestBody Membership membership) {
+    public ResponseEntity<Membership> createMembership(@Valid @RequestBody Membership membership) {
         Membership savedMembership = membershipService.saveMembership(membership);
         return ResponseEntity.ok(savedMembership);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Membership> updateMembership(@PathVariable Long id, @RequestBody Membership membership) {
+    public ResponseEntity<Membership> updateMembership(@PathVariable Long id, @Valid @RequestBody Membership membership) {
         return ResponseEntity.ok(membershipService.updateMembership(id, membership));
     }
 

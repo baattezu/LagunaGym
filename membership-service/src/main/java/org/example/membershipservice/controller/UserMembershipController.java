@@ -1,9 +1,9 @@
 package org.example.membershipservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.example.membershipservice.dto.FreezeRequest;
-import org.example.membershipservice.dto.MembershipRequest;
-import org.example.membershipservice.dto.UserMembershipResponse;
+import org.example.membershipservice.dto.request.FreezeRequest;
+import org.example.membershipservice.dto.request.MembershipRequest;
+import org.example.membershipservice.dto.response.UserMembershipResponse;
 import org.example.membershipservice.entities.UserMembership;
 import org.example.membershipservice.service.UserMembershipService;
 import org.springframework.http.ResponseEntity;

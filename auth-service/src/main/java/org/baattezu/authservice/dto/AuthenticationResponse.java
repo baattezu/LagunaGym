@@ -1,4 +1,4 @@
-package org.baattezu.authservice.model;
+package org.baattezu.authservice.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -2,6 +2,10 @@ package org.baattezu.authservice.services;
 
 
 import lombok.RequiredArgsConstructor;
+import org.baattezu.authservice.client.UserServiceClient;
+import org.baattezu.authservice.dto.AuthenticationRequest;
+import org.baattezu.authservice.dto.AuthenticationResponse;
+import org.baattezu.authservice.dto.RegisterRequest;
 import org.baattezu.authservice.model.*;
 import org.baattezu.authservice.repositories.RoleRepository;
 import org.baattezu.authservice.repositories.UserRepository;
@@ -27,9 +31,16 @@ public class AuthenticationService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final UserServiceClient userServiceClient;
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
-    public AuthenticationResponse register(RegisterRequest request) throws NoSuchElementException {
+    private void emailIsTaken(String email){
+        if (userRepository.existsByEmail(email)){
+            throw new IllegalStateException("Email is taken: " + email );
+        }
+    }
+    public AuthenticationResponse register(RegisterRequest request) {
+        emailIsTaken(request.getEmail());
         Set<Role> roles = new HashSet<>();
         Role userRole = roleRepository.findByName("USER")
                 .orElseThrow(() -> new NoSuchElementException("Role 'USER' not found"));
@@ -39,14 +50,16 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))
                 .roles(roles)
                 .build();
+        userServiceClient.saveUser(new UserInfoDto(user.getEmail()));
         userRepository.save(user);
         String jwtToken = jwtService.generateToken(user);
-        return new AuthenticationResponse().builder()
+
+        return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
     }
 
-    public AuthenticationResponse authenticate(AuthenticationRequest request) throws UsernameNotFoundException {
+    public AuthenticationResponse authenticate(AuthenticationRequest request) {
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(
@@ -64,7 +77,7 @@ public class AuthenticationService {
                     return new UsernameNotFoundException("User not found");
                 });
         String jwtToken = jwtService.generateToken(user);
-        return new AuthenticationResponse().builder()
+        return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
     }

@@ -1,4 +1,4 @@
-package org.baattezu.userservice.service;
+package org.baattezu.userservice.exception;
 
 public class UserNotFoundException extends RuntimeException{
     public UserNotFoundException(String message){

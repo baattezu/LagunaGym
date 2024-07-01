@@ -2,9 +2,10 @@ package org.baattezu.userservice.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.baattezu.userservice.dto.MembershipRequest;
+import org.baattezu.userservice.dto.UserInfoDto;
+import org.baattezu.userservice.dto.response.UserInfoResponse;
 import org.baattezu.userservice.model.UserInfo;
-import org.baattezu.userservice.dto.UserInfoRequest;
+import org.baattezu.userservice.dto.request.UserInfoRequest;
 import org.baattezu.userservice.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -23,26 +24,33 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserInfo> getUserProfileById(@PathVariable Long id) {
-        return ResponseEntity.ok(userService.getUserInfoById(id));
+    public ResponseEntity<UserInfoResponse> getUserProfileById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.getUserInfoResponse(id));
+    }
+    @GetMapping("/{id}/exists")
+    public ResponseEntity<Void> checkUserExists(@PathVariable Long id){
+        userService.checkUserExists(id);
+        return ResponseEntity.ok().build();
+    }
+    @PostMapping
+    public ResponseEntity<Void> saveUser(@RequestBody UserInfoDto userInfoDto){
+        userService.saveUser(userInfoDto.getEmail());
+        return ResponseEntity.ok().build();
+
     }
 
-    @PutMapping
+    @PutMapping("/{id}")
     public ResponseEntity<UserInfo> updateUserProfileByEmail(
+            @PathVariable Long id,
             @Valid @RequestBody UserInfoRequest userInfo
     ){
-        return ResponseEntity.ok(userService.updateUserInfo(userInfo));
+        return ResponseEntity.ok(userService.updateUserInfo(id, userInfo));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserProfileById(@PathVariable Long id) {
         userService.deleteUserInfo(id);
         return ResponseEntity.noContent().build();
-    }
-    @PostMapping("/{userId}/memberships")
-    public ResponseEntity<UserInfo> addMembershipToUser(@PathVariable Long userId, @RequestBody MembershipRequest membershipRequest) {
-        UserInfo updatedUser = userService.addMembershipToUser(userId, membershipRequest);
-        return ResponseEntity.ok(updatedUser);
     }
 
 

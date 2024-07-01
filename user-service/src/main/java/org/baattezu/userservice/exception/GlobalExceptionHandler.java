@@ -1,7 +1,6 @@
 package org.baattezu.userservice.exception;
 
 
-import org.baattezu.userservice.service.UserNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;

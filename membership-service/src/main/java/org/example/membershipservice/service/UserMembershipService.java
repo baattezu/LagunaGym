@@ -2,9 +2,10 @@ package org.example.membershipservice.service;
 
 
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.example.membershipservice.client.UserServiceClient;
-import org.example.membershipservice.dto.UserMembershipResponse;
+import org.example.membershipservice.dto.response.UserMembershipResponse;
 import org.example.membershipservice.entities.Membership;
 import org.example.membershipservice.entities.UserMembership;
 import org.example.membershipservice.entities.UserMembershipId;
@@ -13,6 +14,7 @@ import org.example.membershipservice.exception.NotFoundException;
 import org.example.membershipservice.repository.MembershipRepository;
 import org.example.membershipservice.repository.UserMembershipRepository;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -100,6 +102,17 @@ public class UserMembershipService {
         }
     }
 
+    private void checkUserExists(Long userId){
+        try {
+            userServiceClient.checkUserExists(userId);
+        } catch (FeignException e) {
+            if (e.status() == HttpStatus.NOT_FOUND.value()) {
+                throw new NotFoundException("User not found with id: " + userId);
+            }
+            throw e;
+        }
+    }
+
     /* todo получение информации о абонементе
         1) заполняем отдельный класс вместе с нешаблонными данными
         в которых указано количество дней до конца абонемента и сформатированная дата конца
@@ -134,6 +147,7 @@ public class UserMembershipService {
 
 
     public UserMembership addMembershipToUser(Long userId, Long membershipId){
+        checkUserExists(userId);
         Membership membership = findMembershipById(membershipId);
         UserMembership userMembership = userMembershipRepository.findUserMembershipById_UserId(userId)
                 .orElse(null);
@@ -164,8 +178,8 @@ public class UserMembershipService {
     }
 
 
-    public void deleteUserMembership(UserMembershipId id) {
-        userMembershipRepository.deleteById(id);
+    public void deleteUserMembership(Long userId) {
+        userMembershipRepository.deleteUserMembershipById_UserId(userId);
     }
 
 
@@ -179,7 +193,6 @@ public class UserMembershipService {
             Long userId,
             LocalDate freezeUntil
     ) {
-
         UserMembership userMembership = findUserMembershipById(userId);
         LocalDate now = LocalDate.now();
         LocalDate frozenUntil = userMembership.getFrozenUntil();

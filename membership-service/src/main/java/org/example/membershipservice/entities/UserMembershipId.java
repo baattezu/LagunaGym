@@ -20,5 +20,4 @@ public class UserMembershipId implements Serializable {
         this.membershipId = membershipId;
     }
 
-    // Getters, setters, equals, and hashCode
 }

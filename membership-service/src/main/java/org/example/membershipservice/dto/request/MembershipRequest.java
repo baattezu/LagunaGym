@@ -1,4 +1,5 @@
-package org.baattezu.userservice.dto;
+package org.example.membershipservice.dto.request;
+
 
 import lombok.Data;
 

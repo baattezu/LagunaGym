@@ -14,17 +14,30 @@ spring:
             - Path=/memberships/**
           filters:
             - PrefixPath=/api
-            - AddResponseHeader=X-Powered-By, Temoxa Gateway Service
         - id: auth-service
           uri: lb://auth-service
           predicates:
-            - Path=/api/auth/**
+            - Path=/auth/**
+          filters:
+            - PrefixPath=/api
         - id: user-service
           uri: lb://user-service
           predicates:
             - Path=/users/**
           filters:
             - PrefixPath=/api
+      globalcors:
+        corsConfigurations:
+          '[/**]':
+            allowedOrigins: "*"
+            allowedMethods:
+              - GET
+              - POST
+              - PUT
+              - DELETE
+              - OPTIONS
+              - HEAD
+
 
 eureka:
   client:

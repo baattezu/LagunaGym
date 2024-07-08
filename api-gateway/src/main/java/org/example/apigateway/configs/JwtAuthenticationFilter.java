@@ -19,6 +19,12 @@ public class JwtAuthenticationFilter implements GlobalFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        String path = exchange.getRequest().getURI().getPath();
+
+        if (path.startsWith("/api/auth/")) {
+            return chain.filter(exchange);
+        }
+
         HttpHeaders headers = exchange.getRequest().getHeaders();
         if (!headers.containsKey(HttpHeaders.AUTHORIZATION)) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
@@ -34,8 +40,9 @@ public class JwtAuthenticationFilter implements GlobalFilter {
         String token = authHeader.substring(7);
 
         try {
-            Claims claims = Jwts.parser()
+            Claims claims = Jwts.parserBuilder()
                     .setSigningKey(secretKey)
+                    .build()
                     .parseClaimsJws(token)
                     .getBody();
             exchange.getRequest().mutate().header("user-id", claims.getSubject()).build();

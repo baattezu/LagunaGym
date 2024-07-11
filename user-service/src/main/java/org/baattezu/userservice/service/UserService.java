@@ -30,7 +30,7 @@ public class UserService {
                 );
     }
     private void checkUserExistsAlready(String email) {
-        if (userRepository.findUserInfoByEmail(email).isPresent()) {
+        if (userRepository.existsByEmail(email)) {
             throw new IllegalStateException(String.format("User already exists with email: %s", email));
         }
     }
@@ -45,6 +45,12 @@ public class UserService {
 
     public List<UserInfo> getUsers(){
         return userRepository.findAll();
+    }
+
+
+    public String getEmail(Long id){
+        checkUserExists(id);
+        return findUserInfoById(id).getEmail();
     }
 
     public UserInfoResponse getUserInfoResponse(Long id){

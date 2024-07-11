@@ -6,11 +6,13 @@ import org.baattezu.authservice.client.UserServiceClient;
 import org.baattezu.authservice.dto.AuthenticationRequest;
 import org.baattezu.authservice.dto.AuthenticationResponse;
 import org.baattezu.authservice.dto.RegisterRequest;
+import org.baattezu.authservice.dto.EmailMessage;
 import org.baattezu.authservice.model.*;
 import org.baattezu.authservice.repositories.RoleRepository;
 import org.baattezu.authservice.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
@@ -18,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalTime;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -32,6 +35,8 @@ public class AuthenticationService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final UserServiceClient userServiceClient;
+    private final KafkaTemplate<String, EmailMessage> kafkaTemplate;
+
     private static final Logger logger = LoggerFactory.getLogger(AuthenticationService.class);
 
     private void emailIsTaken(String email){
@@ -53,6 +58,9 @@ public class AuthenticationService {
         userServiceClient.saveUser(new UserInfoDto(user.getEmail()));
         userRepository.save(user);
         String jwtToken = jwtService.generateToken(user);
+
+        EmailMessage message = new EmailMessage(request.getEmail(), "Congratulations! You were registered!");
+        kafkaTemplate.send("verification-events", message);
 
         return AuthenticationResponse.builder()
                 .token(jwtToken)
@@ -77,6 +85,9 @@ public class AuthenticationService {
                     return new UsernameNotFoundException("User not found");
                 });
         String jwtToken = jwtService.generateToken(user);
+
+        EmailMessage message = new EmailMessage(request.getEmail(), "You were logged in at " + LocalTime.now().toString() );
+        kafkaTemplate.send("verification-events", message);
         return AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();

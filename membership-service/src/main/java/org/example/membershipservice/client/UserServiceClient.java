@@ -12,4 +12,7 @@ public interface UserServiceClient {
 
     @GetMapping("/api/users/{id}/exists")
     void checkUserExists(@PathVariable Long id);
+
+    @GetMapping("/api/users/{id}/email")
+    String getEmail(@PathVariable Long id);
 }

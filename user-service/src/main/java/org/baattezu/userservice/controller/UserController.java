@@ -32,6 +32,10 @@ public class UserController {
         userService.checkUserExists(id);
         return ResponseEntity.ok().build();
     }
+    @GetMapping("/{id}/email")
+    public ResponseEntity<String> getEmail(@PathVariable Long id){
+        return ResponseEntity.ok(userService.getEmail(id));
+    }
     @PostMapping
     public ResponseEntity<Void> saveUser(@RequestBody UserInfoDto userInfoDto){
         userService.saveUser(userInfoDto.getEmail());

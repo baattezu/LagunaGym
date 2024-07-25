@@ -28,13 +28,12 @@ public class UserController {
         return ResponseEntity.ok(userService.getUserInfoResponse(id));
     }
     @GetMapping("/{id}/exists")
-    public ResponseEntity<Void> checkUserExists(@PathVariable Long id){
-        userService.checkUserExists(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<Boolean> checkUserExists(@PathVariable Long id){
+        return ResponseEntity.ok(userService.checkUserExistsForMicroservices(id));
     }
     @GetMapping("/{id}/email")
     public ResponseEntity<String> getEmail(@PathVariable Long id){
-        return ResponseEntity.ok(userService.getEmail(id));
+        return ResponseEntity.ok(userService.getEmailForMicroservice(id));
     }
     @PostMapping
     public ResponseEntity<Void> saveUser(@RequestBody UserInfoDto userInfoDto){
@@ -54,7 +53,7 @@ public class UserController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteUserProfileById(@PathVariable Long id) {
         userService.deleteUserInfo(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
 

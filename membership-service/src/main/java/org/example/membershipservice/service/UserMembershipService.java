@@ -15,6 +15,7 @@ import org.example.membershipservice.repository.MembershipRepository;
 import org.example.membershipservice.repository.UserMembershipRepository;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
@@ -104,15 +105,13 @@ public class UserMembershipService {
         }
     }
 
-    private void checkUserExists(Long userId){
-        try {
-            userServiceClient.checkUserExists(userId);
-        } catch (FeignException e) {
-            if (e.status() == HttpStatus.NOT_FOUND.value()) {
-                throw new NotFoundException("User not found with id: " + userId);
-            }
-            throw e;
+    private void checkUserExistsWithException(Long userId){
+        if (!checkUserExists(userId)) {
+            throw new NotFoundException("User not found with id: " + userId);
         }
+    }
+    private boolean checkUserExists(Long userId){
+        return userServiceClient.checkUserExists(userId);
     }
 
     private void sendMessage(String email, String message){
@@ -194,9 +193,12 @@ public class UserMembershipService {
 
 
     public void deleteUserMembership(Long userId) {
-        checkUserExists(userId);
-        sendMessage(userServiceClient.getEmail(userId),"We are sorry, but your membership got cancelled");
-        userMembershipRepository.deleteUserMembershipById_UserId(userId);
+        if (checkUserExists(userId)){
+            userMembershipRepository.deleteUserMembershipById_UserId(userId);
+            sendMessage(userServiceClient.getEmail(userId),"We are sorry, but your membership got cancelled");
+        } else {
+            throw new NotFoundException("User not found with id: " + userId);
+        }
     }
 
 

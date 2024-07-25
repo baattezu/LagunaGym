@@ -11,7 +11,7 @@ public interface UserServiceClient {
     String getUser(@PathVariable Long id);
 
     @GetMapping("/api/users/{id}/exists")
-    void checkUserExists(@PathVariable Long id);
+    boolean checkUserExists(@PathVariable Long id);
 
     @GetMapping("/api/users/{id}/email")
     String getEmail(@PathVariable Long id);

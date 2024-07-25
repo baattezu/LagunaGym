@@ -1,14 +1,11 @@
 package org.baattezu.authservice.services;
 
 
+import com.baattezu.shared.EmailMessage;
 import lombok.RequiredArgsConstructor;
 import org.baattezu.authservice.client.UserServiceClient;
-import org.baattezu.authservice.dto.AuthenticationRequest;
-import org.baattezu.authservice.dto.AuthenticationResponse;
-import org.baattezu.authservice.dto.RegisterRequest;
-import org.baattezu.authservice.dto.EmailMessage;
+import org.baattezu.authservice.dto.*;
 import org.baattezu.authservice.model.*;
-import org.baattezu.authservice.repositories.RoleRepository;
 import org.baattezu.authservice.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,21 +13,20 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class AuthenticationService {
 
     private final UserRepository userRepository;
-    private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
@@ -46,25 +42,23 @@ public class AuthenticationService {
     }
     public AuthenticationResponse register(RegisterRequest request) {
         emailIsTaken(request.getEmail());
-        Set<Role> roles = new HashSet<>();
-        Role userRole = roleRepository.findByName("USER")
-                .orElseThrow(() -> new NoSuchElementException("Role 'USER' not found"));
-        roles.add(userRole);
+
         User user = User.builder()
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .roles(roles)
+                .role(Role.ROLE_USER)
                 .build();
         userServiceClient.saveUser(new UserInfoDto(user.getEmail()));
         userRepository.save(user);
         String jwtToken = jwtService.generateToken(user);
 
-        EmailMessage message = new EmailMessage(request.getEmail(), "Congratulations! You were registered!");
-        kafkaTemplate.send("verification-events", message);
-
-        return AuthenticationResponse.builder()
+        AuthenticationResponse response = AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+
+        sendMessage(request.getEmail(), "Congratulations! You were registered!");
+
+        return response;
     }
 
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
@@ -84,12 +78,55 @@ public class AuthenticationService {
                     logger.error("User not found with email: {}", request.getEmail());
                     return new UsernameNotFoundException("User not found");
                 });
-        String jwtToken = jwtService.generateToken(user);
 
-        EmailMessage message = new EmailMessage(request.getEmail(), "You were logged in at " + LocalTime.now().toString() );
-        kafkaTemplate.send("verification-events", message);
-        return AuthenticationResponse.builder()
+        Map<String, Object> claims = new HashMap<>();
+        Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
+        List<String> roles = authorities.stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
+        claims.put("roles", roles);
+
+        String jwtToken = jwtService.generateToken(claims, user);
+
+        AuthenticationResponse response = AuthenticationResponse.builder()
                 .token(jwtToken)
                 .build();
+
+        sendMessage(request.getEmail(), "You were logged in at " + LocalTime.now().toString());
+        return response;
+    }
+
+    public void assignRole(Long userId, String roleName) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> {
+                    logger.error("User not found with id: {}", userId);
+                    return new UsernameNotFoundException("User not found");
+                });
+
+        Role role = getRoleByName(roleName).orElseThrow(() -> {
+            logger.error("Role not found: {}", roleName);
+            return new IllegalArgumentException("Role not found: " + roleName);
+        });
+
+        user.setRole(role);
+        userRepository.save(user);
+        sendMessage(user.getEmail(), "You were given new role : " + roleName);
+    }
+
+    private Optional<Role> getRoleByName(String roleName) {
+        try {
+            return Optional.of(Role.valueOf(roleName));
+        } catch (IllegalArgumentException e) {
+            return Optional.empty();
+        }
+    }
+    private void sendMessage(String email, String message){
+        kafkaTemplate.send("verification-events", new EmailMessage(email, message));
+    }
+
+    public String deleteUser(Long userId) {
+        userRepository.deleteById(userId);
+        userServiceClient.deleteUserById(userId);
+        return "User deleted successfully.";
     }
 }

@@ -1,4 +1,4 @@
-package org.example.membershipservice.controller;
+package org.example.membershipservice.controller.manager;
 
 
 import jakarta.validation.Valid;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/memberships")
+@RequestMapping("/api/manager/memberships")
 @Validated
 public class MembershipCrudController {
 

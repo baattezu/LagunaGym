@@ -91,8 +91,12 @@ public class UserService {
 
 
     public void deleteUserInfo(Long id) {
+        try{
+            membershipClient.deleteUserMembership(id);
+        } catch (Exception e) {
+            throw new UserNotFoundException("User not found with id: "+ id);
+        }
         userRepository.deleteById(id);
-        membershipClient.deleteUserMembership(id);
     }
 
 

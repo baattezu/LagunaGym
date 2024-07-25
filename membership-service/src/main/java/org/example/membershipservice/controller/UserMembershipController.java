@@ -50,5 +50,12 @@ public class UserMembershipController {
         );
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteUserMembership(
+            @PathVariable Long id
+    ){
+        userMembershipService.deleteUserMembership(id);
+        return ResponseEntity.noContent().build();
+    }
 
 }

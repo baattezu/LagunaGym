@@ -1,11 +1,10 @@
 package org.example.membershipservice.service;
 
 
-
+import com.baattezu.shared.EmailMessage;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.example.membershipservice.client.UserServiceClient;
-import org.example.membershipservice.dto.EmailMessage;
 import org.example.membershipservice.dto.response.UserMembershipResponse;
 import org.example.membershipservice.entities.Membership;
 import org.example.membershipservice.entities.UserMembership;
@@ -116,6 +115,11 @@ public class UserMembershipService {
         }
     }
 
+    private void sendMessage(String email, String message){
+        EmailMessage emailMessage = new EmailMessage(email, message);
+        kafkaTemplate.send("membership-events", emailMessage);
+    }
+
     /* todo получение информации о абонементе
         1) заполняем отдельный класс вместе с нешаблонными данными
         в которых указано количество дней до конца абонемента и сформатированная дата конца
@@ -173,15 +177,14 @@ public class UserMembershipService {
             userMembership.setFrozenUntil(newDate.minusDays(1));
             userMembership.setLastFreeze(newDate.minusDays(1));
         }
-        EmailMessage emailMessage = new EmailMessage(
-                userServiceClient.getEmail(userId),
-                "Your got new \""+ membership.getName() + "\" membership at : " + formatDate(LocalDate.now()) +
-                        "\n \""+ membership.getName() +"\" membership includes " +
-                        membership.getMonths() + " months of unlimited access," +
-                        "Description: " + membership.getDescription() +
-                        "\nYour new membership ends at: " + formatDate(userMembership.getEndDate())
-        );
-        kafkaTemplate.send("membership-events", emailMessage);
+
+        String message = "Your got new \""+ membership.getName() + "\" membership at : " + formatDate(LocalDate.now()) +
+                "\n \""+ membership.getName() +"\" membership includes " +
+                membership.getMonths() + " months of unlimited access," +
+                "Description: " + membership.getDescription() +
+                "\nYour new membership ends at: " + formatDate(userMembership.getEndDate());
+        sendMessage(userServiceClient.getEmail(userId), message);
+
         return userMembershipRepository.save(userMembership);
     }
 
@@ -192,11 +195,7 @@ public class UserMembershipService {
 
     public void deleteUserMembership(Long userId) {
         checkUserExists(userId);
-        EmailMessage emailMessage = new EmailMessage(
-                userServiceClient.getEmail(userId),
-                "We are sorry, but your membership got cancelled"
-        );
-        kafkaTemplate.send("membership-events", emailMessage);
+        sendMessage(userServiceClient.getEmail(userId),"We are sorry, but your membership got cancelled");
         userMembershipRepository.deleteUserMembershipById_UserId(userId);
     }
 
@@ -228,13 +227,12 @@ public class UserMembershipService {
         userMembership.setLastFreeze(freezeUntil);
 
 
-        EmailMessage emailMessage = new EmailMessage(
-                userServiceClient.getEmail(userId),
-                "Your membership has been frozen at : " + formatDate(now) +
-                        "\nUntil:" + formatDate(userMembership.getFrozenUntil()) +
-                        "\nYour membership ends at: " + formatDate(userMembership.getEndDate())
-        );
-        kafkaTemplate.send("membership-events", emailMessage);
+
+        String message = "Your membership has been frozen at : " + formatDate(now) +
+                "\nUntil:" + formatDate(userMembership.getFrozenUntil()) +
+                "\nYour membership ends at: " + formatDate(userMembership.getEndDate());
+        sendMessage(userServiceClient.getEmail(userId), message);
+
 
         return userMembershipRepository.save(userMembership);
     }
@@ -265,12 +263,11 @@ public class UserMembershipService {
 
         unfreezeMembership(userMembership, now, frozenUntil, endDate);
 
-        EmailMessage emailMessage = new EmailMessage(
-                userServiceClient.getEmail(userId),
-                "Your membership has been unfrozen at " + formatDate(now) + "\n" +
-                        "Your membership ends at " + userMembership.getEndDate()
-        );
-        kafkaTemplate.send("membership-events", emailMessage);
+
+        String message = "Your membership has been unfrozen at " + formatDate(now) + "\n" +
+                "Your membership ends at " + userMembership.getEndDate();
+        sendMessage(userServiceClient.getEmail(userId), message);
+
 
         return userMembershipRepository.save(userMembership);
     }

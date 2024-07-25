@@ -1,5 +1,6 @@
 package org.baattezu.userservice.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.baattezu.userservice.client.MembershipClient;
 import org.baattezu.userservice.dto.response.UserInfoResponse;
@@ -10,6 +11,8 @@ import org.baattezu.userservice.dto.request.UserInfoRequest;
 import org.baattezu.userservice.repository.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -35,12 +38,18 @@ public class UserService {
         }
     }
 
-    public void checkUserExists(Long id) {
+    private void checkUserExists(Long id) {
         if(!userRepository.existsById(id)){
             throw new UserNotFoundException(
-                    String.format("User does not exists with id : %s", id )
+                    String.format("User does not exist with id : %s", id )
                 );
         }
+    }
+    public boolean checkUserExistsForMicroservices(Long id) {
+        return userRepository.existsById(id);
+    }
+    public String getEmailForMicroservice(Long id){
+        return findUserInfoById(id).getEmail();
     }
 
     public List<UserInfo> getUsers(){
@@ -48,10 +57,6 @@ public class UserService {
     }
 
 
-    public String getEmail(Long id){
-        checkUserExists(id);
-        return findUserInfoById(id).getEmail();
-    }
 
     public UserInfoResponse getUserInfoResponse(Long id){
         UserInfo userInfo = findUserInfoById(id);
@@ -69,7 +74,6 @@ public class UserService {
 
     public UserInfo updateUserInfo(Long id, UserInfoRequest newUserInfo) {
         checkUserExists(id);
-
         UserInfo userInfo = findUserInfoById(id);
         logger.info("Updating user with email: {}", userInfo.getEmail());
 
@@ -78,10 +82,10 @@ public class UserService {
         setIfNotNull(newUserInfo.getPhoneNumber(), userInfo::setPhoneNumber);
         setIfNotNull(newUserInfo.getBirthDate(), userInfo::setBirthDate);
 
-        UserInfo updatedUser = userRepository.save(userInfo);
+        userRepository.save(userInfo);
 
         logger.info("User updated successfully with email: {}", userInfo.getEmail());
-        return updatedUser;
+        return userInfo;
     }
     private <T> void setIfNotNull(T value, Consumer<T> setter) {
         if (value != null) {
@@ -90,13 +94,31 @@ public class UserService {
     }
 
 
-    public void deleteUserInfo(Long id) {
-        try{
-            membershipClient.deleteUserMembership(id);
-        } catch (Exception e) {
-            throw new UserNotFoundException("User not found with id: "+ id);
+
+
+    public void deleteUserInfo(Long userId) {
+
+        deleteUserInMembershipService(userId);;
+        deleteUserFromRepository(userId);
+
+    }
+
+    private void deleteUserInMembershipService(Long userId) {
+        try {
+            ResponseEntity<Void> response = membershipClient.deleteUserMembership(userId);
+            if (response.getStatusCode() != HttpStatus.OK) {
+                throw new IllegalStateException("Failed to delete user in <MEMBERSHIP-SERVICE>. User deletion aborted.");
+            }
+        } catch (FeignException e) {
+            if (e.status() == HttpStatus.NOT_FOUND.value()) {
+                throw new IllegalStateException("Failed to delete user in <MEMBERSHIP-SERVICE>. User deletion aborted.");
+            }
+            throw e;
         }
-        userRepository.deleteById(id);
+    }
+
+    private void deleteUserFromRepository(Long userId) {
+        userRepository.deleteById(userId);
     }
 
 

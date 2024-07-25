@@ -2,6 +2,8 @@ package org.baattezu.authservice.services;
 
 
 import com.baattezu.shared.EmailMessage;
+import feign.FeignException;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.baattezu.authservice.client.UserServiceClient;
 import org.baattezu.authservice.dto.*;
@@ -9,6 +11,8 @@ import org.baattezu.authservice.model.*;
 import org.baattezu.authservice.repositories.UserRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -125,8 +129,38 @@ public class AuthenticationService {
     }
 
     public String deleteUser(Long userId) {
-        userRepository.deleteById(userId);
-        userServiceClient.deleteUserById(userId);
+        String userEmail = getUserEmail(userId);
+
+        deleteUserInUserService(userId);
+        deleteUserFromRepository(userId);
+
+        sendMessage(userEmail, "We deleted your account");
+
         return "User deleted successfully.";
+    }
+
+    private void deleteUserInUserService(Long userId) {
+        try {
+            ResponseEntity<Void> response = userServiceClient.deleteUserById(userId);
+            if (response.getStatusCode() != HttpStatus.OK) {
+                throw new IllegalStateException("Failed to delete user in <USER-SERVICE>. User deletion aborted.");
+            }
+        } catch (FeignException e) {
+            if (e.status() == HttpStatus.NOT_FOUND.value()) {
+                throw new IllegalStateException("Failed to delete user in <USER-SERVICE>. User deletion aborted.");
+            }
+            throw e;
+        }
+    }
+
+    private void deleteUserFromRepository(Long userId) {
+        userRepository.deleteById(userId);
+    }
+
+    private String getUserEmail(Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new IllegalStateException("No such user exists.")
+        );
+        return user.getEmail();
     }
 }

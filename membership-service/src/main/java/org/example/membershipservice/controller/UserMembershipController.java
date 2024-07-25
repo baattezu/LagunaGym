@@ -55,7 +55,7 @@ public class UserMembershipController {
             @PathVariable Long id
     ){
         userMembershipService.deleteUserMembership(id);
-        return ResponseEntity.noContent().build();
+        return ResponseEntity.ok().build();
     }
 
 }

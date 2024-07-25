@@ -1,7 +1,7 @@
 package org.baattezu.notificationservice.service;
 
+import com.baattezu.shared.EmailMessage;
 import lombok.RequiredArgsConstructor;
-import org.baattezu.notificationservice.dto.EmailMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.kafka.annotation.KafkaListener;

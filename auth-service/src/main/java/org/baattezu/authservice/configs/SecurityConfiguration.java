@@ -44,25 +44,14 @@ public class SecurityConfiguration {
         return config.getAuthenticationManager();
     }
 
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         return http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(requests -> requests
-                        .requestMatchers("/api/auth/register", "/api/auth/login", "/ap").permitAll()
+                        .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authenticationProvider(authenticationProvider())
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class).build();
-    }
-    @Bean
-    public SecurityFilterChain membershipSecurityFilterChain(HttpSecurity http) throws Exception {
-        return http
-                .securityMatcher("/api/memberships/**")
-                .authorizeHttpRequests(
-                        request -> request.anyRequest().authenticated()
-                )
-                .httpBasic(Customizer.withDefaults())
-                .build();
     }
 }

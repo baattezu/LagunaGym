@@ -1,9 +1,9 @@
 package org.baattezu.authservice.configs;
 
+import com.baattezu.shared.EmailMessage;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.kafka.support.serializer.JsonSerializer;
-import org.baattezu.authservice.dto.EmailMessage;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;

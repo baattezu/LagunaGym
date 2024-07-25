@@ -5,13 +5,12 @@ import lombok.RequiredArgsConstructor;
 import org.baattezu.authservice.dto.AuthenticationRequest;
 import org.baattezu.authservice.dto.AuthenticationResponse;
 import org.baattezu.authservice.dto.RegisterRequest;
+import org.baattezu.authservice.dto.UserInfoDto;
 import org.baattezu.authservice.services.AuthenticationService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,5 +32,17 @@ public class AuthController {
             @Valid @RequestBody AuthenticationRequest request
     ){
         return ResponseEntity.ok(authenticationService.authenticate(request));
+    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteUser(
+            @PathVariable Long id
+            ){
+        return ResponseEntity.ok(authenticationService.deleteUser(id));
+    }
+    @PreAuthorize("hasRole('ADMIN')")
+    @PostMapping("/assign-role")
+    public ResponseEntity<?> assignRole(@RequestParam Long userId, @RequestParam String roleName) {
+        authenticationService.assignRole(userId, roleName);
+        return ResponseEntity.ok("Role assigned successfully");
     }
 }

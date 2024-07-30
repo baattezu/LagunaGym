@@ -5,7 +5,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.2.2</version>
+        <version>3.3.0</version>
         <relativePath/>
     </parent>
     <groupId>org.baattezu</groupId>
@@ -96,11 +96,6 @@
             <groupId>org.springframework.kafka</groupId>
             <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.baattezu</groupId>
-            <artifactId>shared-library</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
         </dependency>
 
 

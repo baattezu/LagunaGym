@@ -1,6 +1,6 @@
 package org.baattezu.notificationservice.service;
 
-import com.baattezu.shared.EmailMessage;
+import org.baattezu.notificationservice.config.EmailMessage;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

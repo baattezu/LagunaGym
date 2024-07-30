@@ -1,7 +1,6 @@
 package org.baattezu.authservice.services;
 
 
-import com.baattezu.shared.EmailMessage;
 import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

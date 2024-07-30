@@ -97,10 +97,8 @@ public class UserService {
 
 
     public void deleteUserInfo(Long userId) {
-
         deleteUserInMembershipService(userId);;
         deleteUserFromRepository(userId);
-
     }
 
     private void deleteUserInMembershipService(Long userId) {
@@ -120,7 +118,6 @@ public class UserService {
     private void deleteUserFromRepository(Long userId) {
         userRepository.deleteById(userId);
     }
-
 
     public void saveUser(String email) {
         checkUserExistsAlready(email);

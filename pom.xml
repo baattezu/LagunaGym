@@ -40,8 +40,6 @@
     <module>user-service</module>
     		
     <module>notification-service</module>
-          
-    <module>shared-library</module>
 
   </modules>
   	

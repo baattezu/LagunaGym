@@ -68,7 +68,7 @@ public class UserMembershipService {
             throw new FreezeException(String.format(
                     "Membership is frozen already: until %s, wait %s",
                     formatDate(frozenUntil),
-                    calculateRemainingDays(now.atTime(LocalTime.now())))
+                    calculateRemainingDays(frozenUntil.atStartOfDay()))
             );
         }
     }

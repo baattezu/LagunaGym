@@ -25,6 +25,6 @@ eureka:
   instance:
     preferIpAddress: true
 
+
 jwt:
-  secret: mysecretkey
-  expiration: 3600
+  secret: 52f8f8f95212e347b9cabedb65734e30962c6a627e773c75a63125c52a6c13a2

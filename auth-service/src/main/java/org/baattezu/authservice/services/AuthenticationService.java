@@ -2,7 +2,6 @@ package org.baattezu.authservice.services;
 
 
 import feign.FeignException;
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.baattezu.authservice.client.UserServiceClient;
 import org.baattezu.authservice.dto.*;
@@ -88,6 +87,7 @@ public class AuthenticationService {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toList());
         claims.put("roles", roles);
+        claims.put("userId", user.getId());
 
         String jwtToken = jwtService.generateToken(claims, user);
 
@@ -95,7 +95,7 @@ public class AuthenticationService {
                 .token(jwtToken)
                 .build();
 
-        sendMessage(request.getEmail(), "You were logged in at " + LocalTime.now().toString());
+        sendMessage(request.getEmail(), "You were logged in at " + LocalTime.now());
         return response;
     }
 
@@ -156,10 +156,12 @@ public class AuthenticationService {
         userRepository.deleteById(userId);
     }
 
-    private String getUserEmail(Long userId) {
+    public String getUserEmail(Long userId) {
+        logger.info("Fetching email for userId: {}", userId);
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new IllegalStateException("No such user exists.")
         );
         return user.getEmail();
     }
+
 }

@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class EmailMessage {
-    private String email;
+    private String userId;
     private String message;
 }

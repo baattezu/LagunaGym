@@ -102,11 +102,6 @@ public class UserMembershipService {
         }
     }
 
-    private void checkUserExistsWithException(Long userId){
-        if (!checkUserExists(userId)) {
-            throw new NotFoundException("User not found with id: " + userId);
-        }
-    }
     private boolean checkUserExists(Long userId){
         return userServiceClient.checkUserExists(userId);
     }
@@ -156,38 +151,42 @@ public class UserMembershipService {
                 .orElse(null);
 
         if (userMembership != null) {
-            LocalDate endDate = userMembership.getEndDate()
-                    .plusMonths(membership.getMonths());
-            userMembership.setEndDate(endDate);
+            extendMembership(userMembership, membership);
         } else {
-            userMembership = new UserMembership();
-
-            UserMembershipId userMembershipId = new UserMembershipId(userId, membershipId);
-            userMembership.setId(userMembershipId);
-
-            LocalDate newDate = LocalDateTime.now().toLocalDate();
-            userMembership.setStartDate(newDate);
-            userMembership.setEndDate(
-                    newDate.plusMonths(membership.getMonths())
-            );
-            userMembership.setFrozenUntil(newDate.minusDays(1));
-            userMembership.setLastFreeze(newDate.minusDays(1));
+            userMembership = createNewMembership(userId, membershipId, membership);
         }
 
-        String message = "Your got new \""+ membership.getName() + "\" membership at : " + formatDate(LocalDate.now()) +
-                "\n \""+ membership.getName() +"\" membership includes " +
-                membership.getMonths() + " months of unlimited access," +
-                "Description: " + membership.getDescription() +
-                "\nYour new membership ends at: " + formatDate(userMembership.getEndDate());
+        String message = String.format("Your got new \"%s\" membership at : %s\n \"%s\" membership includes %d months of unlimited access," +
+                        "Description: %s\nYour new membership ends at: %s",
+                membership.getName(), formatDate(LocalDate.now()), membership.getName(),
+                membership.getMonths(), membership.getDescription(), formatDate(userMembership.getEndDate()));
         sendMessage(userServiceClient.getEmail(userId), message);
 
         return userMembershipRepository.save(userMembership);
     }
 
-    public List<UserMembership> getAllUserMemberships() {
-        return userMembershipRepository.findAll();
+    private UserMembership createNewMembership(Long userId, Long membershipId, Membership membership) {
+        UserMembership userMembership;
+        userMembership = new UserMembership();
+
+        UserMembershipId userMembershipId = new UserMembershipId(userId, membershipId);
+        userMembership.setId(userMembershipId);
+
+        LocalDate newDate = LocalDateTime.now().toLocalDate();
+        userMembership.setStartDate(newDate);
+        userMembership.setEndDate(
+                newDate.plusMonths(membership.getMonths())
+        );
+        userMembership.setFrozenUntil(newDate.minusDays(1));
+        userMembership.setLastFreeze(newDate.minusDays(1));
+        return userMembership;
     }
 
+    private void extendMembership(UserMembership userMembership, Membership membership) {
+        LocalDate endDate = userMembership.getEndDate()
+                .plusMonths(membership.getMonths());
+        userMembership.setEndDate(endDate);
+    }
 
     public void deleteUserMembership(Long userId) {
         if (checkUserExists(userId)){
@@ -270,4 +269,5 @@ public class UserMembershipService {
 
         return userMembershipRepository.save(userMembership);
     }
+
 }

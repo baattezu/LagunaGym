@@ -35,4 +35,5 @@ public class KafkaConfig {
     public KafkaTemplate<String, EmailMessage> kafkaTemplate(){
         return new KafkaTemplate<>(producerFactory());
     }
+
 }

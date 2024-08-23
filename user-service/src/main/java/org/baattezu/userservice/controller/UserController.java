@@ -47,7 +47,7 @@ public class UserController {
     public ResponseEntity<String> getEmail(@PathVariable Long id){
         return ResponseEntity.ok(userService.getEmailForMicroservice(id));
     }
-    @PostMapping
+    @PostMapping("/save-user-from-auth-service")
     public ResponseEntity<Void> saveUser(@RequestBody UserInfoDto userInfoDto){
         userService.saveUser(userInfoDto.getEmail());
         return ResponseEntity.ok().build();

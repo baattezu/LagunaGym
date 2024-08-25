@@ -26,6 +26,11 @@ docker-compose up -d
 ```powershell
 docker-compose down
 ```
+Документация API лежит в пути
+```http request
+localhost:8765/swagger-ui.html
+```
 
-По всем вопросам писать на почту : temupxan@gmail.com
+
+По всем вопросам писать на почту : temupxan@gmail.com 
 Или в тг для друзей или знакомых : t.me/baattezu

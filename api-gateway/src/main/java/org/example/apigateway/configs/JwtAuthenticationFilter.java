@@ -35,6 +35,9 @@ public class JwtAuthenticationFilter implements GlobalFilter {
             if (path.startsWith("/api/auth/")) {
                 return chain.filter(exchange);
             }
+            if (path.endsWith("/api-docs")) {
+                return chain.filter(exchange);
+            }
 
             HttpHeaders headers = exchange.getRequest().getHeaders();
             if (!headers.containsKey(HttpHeaders.AUTHORIZATION)) {

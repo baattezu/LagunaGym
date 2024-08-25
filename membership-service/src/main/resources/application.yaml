@@ -2,7 +2,7 @@ server:
   port: 8084
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/membershipdb?currentSchema=boot
+    url: jdbc:postgresql://localhost:5435/membershipdb?currentSchema=boot
     username: postgres
     password: temirkhan322
     driver-class-name: org.postgresql.Driver
@@ -18,7 +18,7 @@ spring:
   application:
     name: membership-service
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
 
 eureka:
   client:

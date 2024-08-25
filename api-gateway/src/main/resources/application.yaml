@@ -3,6 +3,9 @@ spring:
     name: api-gateway
   cloud:
     gateway:
+      httpclient:
+        connect-timeout: 20000
+        response-timeout: 7s
       discovery:
         locator:
           enabled: true
@@ -38,6 +41,23 @@ spring:
               - OPTIONS
               - HEAD
 
+springdoc:
+  enable-native-support: true
+  api-docs:
+    enabled: true
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui.html
+    config-url: /v3/api-docs/swagger-config
+    urls:
+      - url: /v3/api-docs
+        name: API Gateway Service
+      - url: /auth-service/v3/api-docs
+        name: Auth Service
+      - url: /user-service/v3/api-docs
+        name: User Service
+      - url: /membership-service/v3/api-docs
+        name: Membership Service
 
 eureka:
   client:

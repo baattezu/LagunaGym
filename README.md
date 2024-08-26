@@ -20,11 +20,11 @@
 
 После же вам придется написать 
 ```powershell
-docker-compose up -d
+docker-compose -f docker-compose.prod.yaml up -d
 ```
 Для завершения стоит использовать 
 ```powershell
-docker-compose down
+docker-compose -f docker-compose.prod.yaml down
 ```
 Документация API лежит в пути
 ```http request

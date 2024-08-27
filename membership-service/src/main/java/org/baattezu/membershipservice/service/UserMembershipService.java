@@ -5,6 +5,7 @@ import org.baattezu.membershipservice.dto.*;
 import lombok.RequiredArgsConstructor;
 import org.baattezu.membershipservice.client.UserServiceClient;
 import org.baattezu.membershipservice.dto.response.UserMembershipResponse;
+import org.baattezu.membershipservice.dto.response.UserMembershipWithId;
 import org.baattezu.membershipservice.entities.Membership;
 import org.baattezu.membershipservice.entities.UserMembership;
 import org.baattezu.membershipservice.entities.UserMembershipId;
@@ -23,6 +24,7 @@ import java.time.LocalTime;
 
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -270,4 +272,17 @@ public class UserMembershipService {
         return userMembershipRepository.save(userMembership);
     }
 
+    public List<UserMembershipWithId> getUsersMemberships() {
+        return userMembershipRepository.findAll()
+                .stream()
+                .map(this::convertUsersMembershipIntoDto)
+                .collect(Collectors.toList());
+    }
+    private UserMembershipWithId convertUsersMembershipIntoDto(UserMembership userMembership){
+        return new UserMembershipWithId(
+                userMembership.getId().getUserId(),
+                userMembership.getEndDate(),
+                userMembership.getFrozenUntil().isAfter(userMembership.getStartDate())
+        );
+    }
 }

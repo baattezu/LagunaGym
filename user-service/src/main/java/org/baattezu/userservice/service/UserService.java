@@ -3,8 +3,10 @@ package org.baattezu.userservice.service;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import org.baattezu.userservice.client.MembershipClient;
+import org.baattezu.userservice.dto.response.UserInfoPlusMembershipInfo;
 import org.baattezu.userservice.dto.response.UserInfoResponse;
 import org.baattezu.userservice.dto.response.UserMembershipResponse;
+import org.baattezu.userservice.dto.response.UserMembershipWithId;
 import org.baattezu.userservice.exception.UserNotFoundException;
 import org.baattezu.userservice.model.UserInfo;
 import org.baattezu.userservice.dto.request.UserInfoRequest;
@@ -15,8 +17,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,7 +73,27 @@ public class UserService {
                 .phoneNumber(userInfo.getPhoneNumber())
                 .membership(membership)
                 .build();
+    }
+    public List<UserInfoPlusMembershipInfo> getUserInfosResponse(){
+        List<UserInfo> userInfos = userRepository.findAll();
+        List<UserMembershipWithId> memberships = membershipClient.getUsersMemberships();
+        return userInfos.stream()
+                .map(u -> getUserInfoPlusMembershipInfo(u, memberships)).toList();
+    }
 
+    private UserInfoPlusMembershipInfo getUserInfoPlusMembershipInfo(UserInfo userInfo, List<UserMembershipWithId> memberships) {
+        Long uiId = userInfo.getId();
+        UserMembershipWithId userMembership = memberships.stream()
+                .filter(membership -> membership.getUserId().equals(uiId))
+                .findAny()
+                .orElse(new UserMembershipWithId(uiId, LocalDate.EPOCH, false));
+        return new UserInfoPlusMembershipInfo(
+                userInfo.getId(),
+                userInfo.getEmail(),
+                userInfo.getPhoneNumber(),
+                userMembership.getEndDate(),
+                userMembership.getIsFrozen()
+        );
     }
 
     public UserInfo updateUserInfo(Long id, UserInfoRequest newUserInfo) {

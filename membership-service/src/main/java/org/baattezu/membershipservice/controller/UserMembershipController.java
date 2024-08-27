@@ -1,8 +1,13 @@
 package org.baattezu.membershipservice.controller;
 
+import io.swagger.v3.oas.annotations.Hidden;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.baattezu.membershipservice.configs.MyAuthenticationToken;
 import org.baattezu.membershipservice.dto.request.FreezeRequest;
+import org.baattezu.membershipservice.dto.response.UserMembershipWithId;
 import org.baattezu.membershipservice.entities.UserMembership;
 import org.baattezu.membershipservice.service.UserMembershipService;
 import org.baattezu.membershipservice.dto.request.MembershipRequest;
@@ -17,15 +22,33 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/memberships/users")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
+@Tag(
+    name = "UserMembership",
+    description = "The UserMembership API. Contains operations like " +
+    "adding memberships to user, " +
+    "getting information about user's membership, " +
+    "freezing and unfreezing user's membership, " +
+    "deleting user's membership"
+)
 public class UserMembershipController {
 
     private final UserMembershipService userMembershipService;
 
+    @GetMapping
+    @PreAuthorize("hasRole('ADMIN') or hasRole('MANAGER')")
+    @Hidden
+    public ResponseEntity<List<UserMembershipWithId>> getUsersMemberships(){
+        return ResponseEntity.ok(userMembershipService.getUsersMemberships());
+    }
     @PostMapping("/{id}")
     @PreAuthorize("@userMembershipController.hasPermission(#id)")
+    @Operation(summary = "Add membership to user")
     public ResponseEntity<UserMembership> addMembershipToUser(
             @PathVariable Long id,
             @RequestBody MembershipRequest request
@@ -39,11 +62,13 @@ public class UserMembershipController {
 
     @GetMapping("/{id}")
     @PreAuthorize("@userMembershipController.hasPermission(#id)")
+    @Operation(summary = "Get user's membership")
     public ResponseEntity<UserMembershipResponse> getUserMembership(@PathVariable Long id){
         return ResponseEntity.ok(userMembershipService.getUserMembershipInfoResponse(id));
     }
     @PostMapping("/{id}/freeze")
     @PreAuthorize("@userMembershipController.hasPermission(#id)")
+    @Operation(summary = "Freeze user's membership")
     public ResponseEntity<UserMembership> freezeMembership(
             @PathVariable Long id,
             @RequestBody FreezeRequest request
@@ -54,6 +79,7 @@ public class UserMembershipController {
     }
     @DeleteMapping("/{id}/freeze")
     @PreAuthorize("@userMembershipController.hasPermission(#id)")
+    @Operation(summary = "Unfreeze user's membership")
     public ResponseEntity<UserMembership> unfreezeMembership(
             @PathVariable Long id
     ){
@@ -65,6 +91,7 @@ public class UserMembershipController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@userMembershipController.hasPermission(#id)")
+    @Operation(summary = "Delete user's membership")
     public ResponseEntity<Void> deleteUserMembership(
             @PathVariable Long id
     ){

@@ -41,4 +41,17 @@ public class UserInfo {
     }
     public UserInfo (){
     }
+
+    @Override
+    public String toString() {
+        return "UserInfo{" +
+                "id=" + id +
+                ", firstName='" + firstName + '\'' +
+                ", lastName='" + lastName + '\'' +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", birthDate=" + birthDate +
+                ", membershipId=" + membershipId +
+                '}';
+    }
 }

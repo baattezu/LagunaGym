@@ -1,6 +1,8 @@
 package org.baattezu.membershipservice.controller;
 
 
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.baattezu.membershipservice.entities.Membership;
@@ -22,6 +24,8 @@ import java.util.List;
 @RequestMapping("/api/memberships")
 @Validated
 @RequiredArgsConstructor
+@SecurityRequirement(name = "Bearer Authentication")
+@Tag(name = "Membership CRUD", description = "The Membership CRUD. Contains operations like creating, getting, updating, deleting memberships")
 public class MembershipCrudController {
 
     private static final Logger logger = LoggerFactory.getLogger(MembershipCrudController.class);

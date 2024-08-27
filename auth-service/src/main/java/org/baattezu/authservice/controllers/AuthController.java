@@ -1,5 +1,8 @@
 package org.baattezu.authservice.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.baattezu.authservice.configs.MyAuthenticationToken;
@@ -26,12 +29,13 @@ import java.security.Principal;
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
 @Validated
+@Tag(name = "Auth", description = "The Auth API. Contains operations like authentication, registration, assigning roles, deletion of users")
 public class AuthController {
 
     private final AuthenticationService authenticationService;
 
-
     @PostMapping("/register")
+    @Operation(summary = "Register user", description = "Register user")
     public ResponseEntity<AuthenticationResponse> register(
             @Valid @RequestBody RegisterRequest request
     ){
@@ -39,6 +43,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
+    @Operation(summary = "Authenticate user", description = "Authenticate user")
     public ResponseEntity<AuthenticationResponse> authenticate(
             @Valid @RequestBody AuthenticationRequest request
     ){
@@ -47,17 +52,27 @@ public class AuthController {
 
     @DeleteMapping("/{id}")
     @PreAuthorize("@authController.hasRoleAdminOrIsTheSameUser(#id)")
+    @Operation(
+            summary = "Delete user",
+            description = "Delete user while having ROLE_ADMIN",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
     public ResponseEntity<String> deleteUser(@PathVariable Long id){
         return ResponseEntity.ok(authenticationService.deleteUser(id));
     }
 
-    @PostMapping("/assign-role")
+    @PatchMapping("/{id}/assign-role")
     @PreAuthorize("@authController.hasRoleAdminOrIsTheSameUser(#userId)")
+    @Operation(
+            summary = "Assign role",
+            description = "Assign role to user while having ROLE_ADMIN",
+            security = @SecurityRequirement(name = "Bearer Authentication")
+    )
     public ResponseEntity<?> assignRole(
-            @RequestParam Long userId,
+            @PathVariable Long id,
             @RequestParam String roleName
     ) {
-        authenticationService.assignRole(userId, roleName);
+        authenticationService.assignRole(id, roleName);
         return ResponseEntity.ok("Role assigned successfully");
     }
 
@@ -74,7 +89,6 @@ public class AuthController {
         if (isSameUser) {
             throw new AccessDeniedException("You cannot perform this action on yourself.");
         }
-
         return true;
     }
 
